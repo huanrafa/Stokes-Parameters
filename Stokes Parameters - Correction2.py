@@ -1,10 +1,10 @@
 #Update (compared to Stokes Parameters - Correction): In the previous version, we're only able to use one single value of Retardance. In this version, we can apply a Retardance curve file
-#Note: wavelength range of the retardance curve is 416.11859 --> 750.89575
+#Note: wavelength range of the retardance curve is 416.11859 --> 750.89575nm
 
 #Intensity files:
-yourpath = r'C:\Users\PA\Desktop\TestCode_LP1 and LP2 at (max) _ LP(stokes) = 4\Converted'
+yourpath = r'C:\Users\PA\Desktop\TestCode_LP1 and LP2 at (max) _ LP(stokes) = 4\Converted P3HT'
 #Retardance curve file (radian):
-thetapath = r'C:\Users\PA\Desktop\retardance curve extended(416_750nm) (QWP_Stokes) (radian).txt'
+thetapath = r'C:\Users\hangu\Desktop\Test objectives 2020\retardance curve extended(416_750nm) (QWP_Stokes) (radian).txt'
 
 import math
 import os
@@ -57,20 +57,22 @@ if float(wavelength_lst[0]) > float(wavelength_r_lst[0]):
     min_range = abs(float(wavelength_lst[0]) - float(wavelength_r_lst[0]))
     index = 0
     for i in range(len(wavelength_r_lst)):
+        #print(min_range)
         if abs(float(wavelength_lst[0]) - float(wavelength_r_lst[i])) < min_range:
-            min_range = abs(float(wavelength_lst[0]) - float(wavelength_r_lst[0]))
+            min_range = abs(float(wavelength_lst[0]) - float(wavelength_r_lst[i]))
             index = i
-        #print(str(i))
+        
 
     if wavelength_lst[-1] <= wavelength_r_lst[-1]:                             # if the wavelength range does not exceed 750nm
         wavelength_r_lst = wavelength_r_lst[index:index+len(wavelength_lst)]   # new wavelength_r_lst, length = len(wavelength_lst)
         retardance_lst = retardance_lst[index:index+len(wavelength_lst)]       # new retardance_lst, length = len(wavelength_lst)
-    else:
+    else:                                                                      # if the wavelength range does exceed 750nm
+        df = df[:len(wavelength_r_lst)-index]
         wavelength_r_lst = wavelength_r_lst[index:]   
         retardance_lst = retardance_lst[index:]
-        df = df[:len(wavelength_r_lst)-index]       
+               
 
-else:
+else:                                                                    
     min_range = abs(float(wavelength_r_lst[0]) - float(wavelength_lst[0]))
     index = 0
     for i in range(len(wavelength_lst)):
@@ -79,14 +81,17 @@ else:
             index = i
         #print(str(i))
 
-    wavelength_r_lst = wavelength_r_lst[:(len(wavelength_lst)-index)]   # new wavelength_r_lst, length = len(wavelength_lst)
-    retardance_lst = retardance_lst[:(len(wavelength_lst)-index)]       # new retardance_lst, length = len(wavelength_lst)
+    wavelength_r_lst = wavelength_r_lst[:(len(wavelength_lst)-index)]   # new wavelength_r_lst
+    retardance_lst = retardance_lst[:(len(wavelength_lst)-index)]       # new retardance_lst
     df = df[index:]                                                     # new dataframe, which is shorter than the original one
     wavelength_lst = wavelength_lst[index:]                             # new wavelength_lst, this is only used for printing wavelength labels in the output file
 
-print(wavelength_r_lst[0])
-print(wavelength_r_lst[-1])
-print(index)
+#print(min_range)
+#print(index)
+#print(len(wavelength_r_lst))
+#print(len(retardance_lst))
+#print(len(list(df.index.values)))
+
 
 #2 Make lists of A B C D:
 A_lst = []
@@ -181,12 +186,3 @@ for i in range(len(S0_lst)):
 new_file.close()
 
 
-
-#with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-#   print(sum_df)
-#for i in df.loc[0]:
-#    print(i)
-#print(min(S0_lst))
-#print(C_lst[0])
-#print(len(wavelength_lst))
-#print(len(list(df.index)))
